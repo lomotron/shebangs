@@ -1,6 +1,6 @@
-#!/usr/bin/env -S bash -euo pipefail -c 'f="$0";n=$(awk "/^#!.+$/ {n=NR}END{print n}" "$f" ); t=$(sed -e "s/^# //" -ne "2,$((n-1))p" "$f"); s=$(tail +$n "$f" | base64) ; i="$(read -t 0 && base64)" eval "echo \\"$t\\"" | bash -eu'
+#!/usr/bin/env -S bash -euo pipefail -c 'f="$0";n=$(awk "/^#!.+$/ {n=NR}END{print n}" "$f" ); t=$(sed -e "s/^# //" -ne "2,$((n-1))p" "$f"); s=$(tail +$n "$f" | base64 -w0) ; i="$(read -t 0 && base64 -w0)" eval "echo \\"$t\\"" | bash -eu'
 # timeout=300
-# mount=/mnt
+# mount=/tmp
 # name="adhoc-\$HOSTNAME-\$USER-$(basename $f| sed "s/[^[:alnum:]]/-/g")-\$timeout"
 # kubectl get job \$name &> /dev/null && kubectl delete job \$name > /dev/null
 # kubectl apply -f - <<EOF > /dev/null
@@ -45,8 +45,8 @@
 #   [[ "\$status" == "Succeeded" ]] && retval=0 && break
 #   sleep 1
 # done
-# kubectl logs -f \$podname
+# kubectl logs -f \$podname && kubectl delete job \$name > /dev/null && kubectl delete secret \${name}-data > /dev/null
 # exit \$retval
 #
 #!/bin/sh
-echo $(cat) from $@
+cat | $@
